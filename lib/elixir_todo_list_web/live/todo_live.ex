@@ -49,8 +49,6 @@ defmodule ElixirTodoListWeb.TodoLive do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    task = Repo.get(Task, id)
-
     case Repo.get(Task, id) do
       nil -> socket
       task -> Repo.delete(task)
@@ -119,7 +117,9 @@ defmodule ElixirTodoListWeb.TodoLive do
                 />
 
                 <label class={
-                  if task.completed, do: "line-through text-gray-500", else: "text-gray-900"
+                  if task.completed,
+                    do: "line-through text-gray-400 italic",
+                    else: "text-gray-900 font-medium"
                 }>
                   {task.title}
                 </label>
@@ -130,7 +130,7 @@ defmodule ElixirTodoListWeb.TodoLive do
               type="button"
               phx-click="delete"
               phx-value-id={task.id}
-              class="!p-1 !bg-red-500 hover:!bg-red-700"
+              class="!p-2 !bg-red-600 hover:!bg-red-700 text-white font-bold rounded-full"
             >
               &times;
             </.button>
