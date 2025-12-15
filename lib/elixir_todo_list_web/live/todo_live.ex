@@ -65,9 +65,7 @@ defmodule ElixirTodoListWeb.TodoLive do
   def handle_event("toggle_complete", %{"id" => id, "task" => task_params}, socket) do
     task = Repo.get!(Task, id)
 
-    completed_status = Map.has_key?(task_params, "completed")
-
-    changeset = Task.changeset(task, %{completed: completed_status})
+    changeset = Task.changeset(task, task_params)
 
     Repo.update(changeset)
 
