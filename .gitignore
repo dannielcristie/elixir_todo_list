@@ -35,3 +35,7 @@ elixir_todo_list-*.tar
 npm-debug.log
 /assets/node_modules/
 
+
+# SQLite Database
+*.db-shm
+*.db-wal
