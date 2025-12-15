@@ -14,7 +14,8 @@ defmodule ElixirTodoListWeb.TodoLive do
     socket =
       assign(socket,
         tasks: tasks,
-        form: form
+        form: form,
+        editing_task_id: nil
       )
 
     {:ok, socket}
@@ -27,24 +28,27 @@ defmodule ElixirTodoListWeb.TodoLive do
   end
 
   @impl true
-  def handle_event("save_task", %{"task" => task_params}, socket) do
+  def handle_event("validate", %{"task" => task_params}, socket) do
     changeset = Task.changeset(%Task{}, task_params)
+    {:noreply, assign(socket, form: to_form(changeset))}
+  end
 
-    socket_atualizado =
-      case Repo.insert(changeset) do
-        {:ok, _new_task} ->
-          novo_changeset_vazio = Task.changeset(%Task{}, %{})
+  @impl true
+  def handle_event("save_task", %{"task" => task_params}, socket) do
+    case %Task{} |> Task.changeset(task_params) |> Repo.insert() do
+      {:ok, _task} ->
+        socket_atualizado =
+          assign(socket,
+            tasks: Repo.all(Task),
+            form: to_form(Task.changeset(%Task{}, %{}))
+          )
+          |> put_flash(:info, "Tarefa criada com sucesso!")
 
-          socket
-          |> assign(:tasks, Repo.all(Task))
-          |> assign(:form, to_form(novo_changeset_vazio))
-          |> put_flash(:info, "Tarefa salva com sucesso!")
+        {:noreply, socket_atualizado}
 
-        {:error, failed_changeset} ->
-          assign(socket, form: to_form(failed_changeset))
-      end
-
-    {:noreply, socket_atualizado}
+      {:error, changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
   end
 
   @impl true
@@ -75,14 +79,44 @@ defmodule ElixirTodoListWeb.TodoLive do
   end
 
   @impl true
+  def handle_event("edit_task", %{"id" => id}, socket) do
+    {:noreply, assign(socket, editing_task_id: String.to_integer(id))}
+  end
+
+  @impl true
+  def handle_event("cancel_edit", _params, socket) do
+    {:noreply, assign(socket, editing_task_id: nil)}
+  end
+
+  @impl true
+  def handle_event("save_edit", %{"id" => id, "task" => task_params}, socket) do
+    task = Repo.get!(Task, id)
+
+    case Task.changeset(task, task_params) |> Repo.update() do
+      {:ok, _task} ->
+        socket =
+          assign(socket,
+            tasks: Repo.all(Task),
+            editing_task_id: nil
+          )
+          |> put_flash(:info, "Tarefa atualizada!")
+
+        {:noreply, socket}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Erro ao atualizar tarefa.")}
+    end
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full max-w-lg mx-auto mt-12 p-6 bg-white rounded-lg shadow-md">
       <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
-        Minha Lista de Tarefas (com DB!)
+        Minha Lista de Tarefas
       </h1>
 
-      <.form for={@form} id="task-form" phx-submit="save_task">
+      <.form for={@form} id="task-form" phx-change="validate" phx-submit="save_task">
         <.input
           field={@form[:title]}
           type="text"
@@ -99,39 +133,85 @@ defmodule ElixirTodoListWeb.TodoLive do
             id={"task-#{task.id}"}
             class="flex justify-between items-center p-3 border-b"
           >
-            <% task_form = Task.changeset(task, %{}) |> to_form() %>
-
-            <.form
-              for={task_form}
-              phx-change="toggle_complete"
-              phx-value-id={task.id}
-              class="flex-grow"
-            >
-              <div class="flex items-center space-x-4">
+            <%= if @editing_task_id == task.id do %>
+              <% task_form = Task.changeset(task, %{}) |> to_form() %>
+              <.form
+                for={task_form}
+                phx-submit="save_edit"
+                phx-value-id={task.id}
+                id={"edit-form-#{task.id}"}
+                class="flex-grow flex items-center gap-2 w-full"
+              >
                 <.input
-                  type="checkbox"
-                  field={task_form[:completed]}
-                  class="flex-shrink-0"
+                  field={task_form[:title]}
+                  type="text"
+                  class="flex-grow input input-bordered input-sm w-full"
+                  id={"edit-input-#{task.id}"}
+                  placeholder="Editar tarefa..."
                 />
+                <div class="flex gap-2 shrink-0">
+                  <.button type="submit" class="btn btn-sm btn-success text-white">
+                    Salvar
+                  </.button>
+                  <.button
+                    type="button"
+                    phx-click="cancel_edit"
+                    class="btn btn-sm btn-ghost"
+                  >
+                    Cancelar
+                  </.button>
+                </div>
+              </.form>
+            <% else %>
+              <% task_form = Task.changeset(task, %{}) |> to_form() %>
 
-                <label class={
-                  if task.completed,
-                    do: "line-through text-gray-400 italic",
-                    else: "text-gray-900 font-medium"
-                }>
-                  {task.title}
-                </label>
+              <.form
+                for={task_form}
+                phx-change="toggle_complete"
+                phx-value-id={task.id}
+                id={"task-item-form-#{task.id}"}
+                class="flex-grow"
+              >
+                <div class="flex items-center space-x-4">
+                  <.input
+                    type="checkbox"
+                    field={task_form[:completed]}
+                    id={"task-#{task.id}-completed"}
+                    class="flex-shrink-0"
+                  />
+
+                  <label
+                    class={
+                      if task.completed,
+                        do: "line-through text-gray-400 italic",
+                        else: "text-gray-900 font-medium"
+                    }
+                    for={"task-#{task.id}-completed"}
+                  >
+                    {task.title}
+                  </label>
+                </div>
+              </.form>
+
+              <div class="flex space-x-2">
+                <.button
+                  type="button"
+                  phx-click="edit_task"
+                  phx-value-id={task.id}
+                  class="!p-2 !bg-blue-500 hover:!bg-blue-700 text-white font-bold rounded-full"
+                >
+                  ✏️
+                </.button>
+                <.button
+                  type="button"
+                  phx-click="delete"
+                  phx-value-id={task.id}
+                  class="!p-2 !bg-red-600 hover:!bg-red-700 text-white font-bold rounded-full"
+                >
+                  &times;
+                </.button>
               </div>
-            </.form>
-
-            <.button
-              type="button"
-              phx-click="delete"
-              phx-value-id={task.id}
-              class="!p-2 !bg-red-600 hover:!bg-red-700 text-white font-bold rounded-full"
-            >
-              &times;
-            </.button>
+            <% end %>
           </li>
         </ul>
       </div>
