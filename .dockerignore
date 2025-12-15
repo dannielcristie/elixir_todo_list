@@ -1,0 +1,7 @@
+_build
+deps
+.git
+.elixir_ls
+elixir_todo_list.db
+elixir_todo_list.db-shm
+elixir_todo_list.db-wal

@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      # Persist the database file
+      - ./elixir_todo_list.db:/app/elixir_todo_list.db
+      # Mount source code for hot reload
+      - .:/app
+      # Avoid overwriting container deps with host deps (optional but safer)
+      - /app/deps
+      - /app/_build
+    environment:
+      - MIX_ENV=dev

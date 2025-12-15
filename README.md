@@ -16,15 +16,45 @@ Este projeto é uma aplicação "Todo List" full-stack desenvolvida com Elixir e
 
 ## Como Rodar
 
+### Rodando com Docker
+
+#### Pré-requisitos
+
+- Docker
+- Docker Compose
+
+#### Instruções
+
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/dannielcristie/elixir_todo_list.git
+    cd elixir_todo_list
+    ```
+
+2.  **Inicie a aplicação com Docker Compose:**
+    ```bash
+    docker compose up --build
+    ```
+
+3.  **Acesse a aplicação:**
+    Abra seu navegador e acesse `http://localhost:4000`.
+
+4.  **Para parar a aplicação:**
+    ```bash
+    docker compose down
+    ```
+
+### Rodando Localmente
+
 Para executar o projeto diretamente na sua máquina, você precisará ter o ambiente Elixir e Node.js configurado.
 
-### Pré-requisitos
+#### Pré-requisitos
 
 - Elixir (versão 1.14 ou superior)
 - Erlang/OTP
 - Node.js e npm (para assets)
 
-### Instruções
+#### Instruções
 
 1.  **Clone o repositório e instale as dependências:**
     ```bash
