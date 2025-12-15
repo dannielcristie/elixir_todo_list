@@ -1,18 +1,59 @@
-# ElixirTodoList
+# Elixir - Todo List
 
-To start your Phoenix server:
+## Nome do Aluno : Danniel Cristie
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Tutorial Base
+[Como Criar um App Todo List com Elixir e LiveView do Zero](https://profsergiocosta.notion.site/Como-Criar-um-App-Todo-List-com-Elixir-e-LiveView-do-Zero-2a8cce97509380eba53fc82bbeb08435)
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Descrição
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+Este projeto é uma aplicação "Todo List" full-stack desenvolvida com Elixir e Phoenix LiveView.
 
-## Learn more
+**Tecnologias:**
+- **Backend:** Elixir, Phoenix, Ecto, SQLite
+- **Frontend:** Phoenix LiveView, Tailwind CSS, DaisyUI
+- **Ambiente:** Mix
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+## Como Rodar
+
+Para executar o projeto diretamente na sua máquina, você precisará ter o ambiente Elixir e Node.js configurado.
+
+### Pré-requisitos
+
+- Elixir (versão 1.14 ou superior)
+- Erlang/OTP
+- Node.js e npm (para assets)
+
+### Instruções
+
+1.  **Clone o repositório e instale as dependências:**
+    ```bash
+    git clone https://github.com/dannielcristie/elixir_todo_list.git
+    cd elixir_todo_list
+    mix deps.get
+    ```
+
+2.  **Prepare o banco de dados:**
+    Este comando cria o banco de dados SQLite e roda as migrações necessárias.
+    ```bash
+    mix setup
+    ```
+
+3.  **Inicie o servidor:**
+    Em um terminal, execute:
+    ```bash
+    mix phx.server
+    ```
+    O servidor estará rodando na porta `4000`.
+
+4.  **Acesse a aplicação:**
+    Abra seu navegador e acesse `http://localhost:4000`.
+
+## Funcionalidades
+
+A aplicação permite:
+
+- **Listar tarefas:** Visualização de todas as tarefas cadastradas.
+- **Criar tarefa:** Adição de novas tarefas via formulário.
+- **Concluir tarefa:** Alternar o status de uma tarefa (pendente/concluída) clicando no checkbox.
+- **Excluir tarefa:** Remoção de tarefas do banco de dados.
