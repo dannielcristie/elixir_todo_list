@@ -39,3 +39,6 @@ npm-debug.log
 # SQLite Database
 *.db-shm
 *.db-wal
+
+# Elixir LS
+.elixir_ls/
