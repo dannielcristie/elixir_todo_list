@@ -66,6 +66,7 @@ import_config "#{config_env()}.exs"
 
 config :elixir_todo_list, ElixirTodoList.Repo,
   database: "elixir_todo_list.db",
+  journal_mode: :delete,
   priv: "priv/repo"
 
 config :elixir_todo_list, ecto_repos: [ElixirTodoList.Repo]
